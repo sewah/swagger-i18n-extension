@@ -31,17 +31,15 @@ function translate(object, language) {
             var matches = regexp.exec(key);
             if (matches) {
                 var fieldName = matches[1];
-                if (typeof(subject[fieldName]) !== 'string') {
-                    throw new Error('Field `' + fieldName + '` at `' + path + '` must be filled and being string')
-                }
+                var orgType = typeof(subject[fieldName]);
                 if (typeof(value) !== 'object') {
                     throw new Error('Field `' + path + '` must be object')
                 }
                 if (typeof(value[language]) === 'undefined') {
                     throw new Error('Field `' + path + '` does not contain language translation `' + language + '`')
                 }
-                if (typeof(value[language]) !== 'string') {
-                    throw new Error('Field at `' + path + '.' + language + '` must be string ')
+                if (typeof(value[language]) !== orgType) {
+                    throw new Error('Field at `' + path + '.' + language + '` must be "' + orgType + '" but is "' + typeof(value[language]) + '"')
                 }
                 subject[fieldName] = value[language]
                 delete subject[key]

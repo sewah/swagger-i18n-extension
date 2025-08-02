@@ -29,13 +29,16 @@ function loadFromFile(path, format) {
     return YAML.parse(content);
 }
 
-function encodeResult(result, format) {
+function encodeResult(result, format, indent) {
     if (format === undefined) {
         format = 'yaml'
     }
     if (format === 'yaml' || format === 'yml') {
         return YAML.stringify(result)
     } else if (format === 'json') {
+        if (typeof indent === 'number') {
+            return JSON.stringify(result, null, indent)
+        }
         return JSON.stringify(result)
     }
     console.error('Unknown output format: ' + format)
@@ -48,7 +51,11 @@ function describeInputFile(yargs) {
     });
     yargs.option('format', {
         describe: 'Possible format file: ' + formats().join(',')
-    })
+    });
+    yargs.option('indent', {
+        describe: 'Number of spaces for JSON output indentation',
+        type: 'number'
+    });
 }
 
 let commands = yargs
@@ -94,7 +101,7 @@ let commands = yargs
         (argv) => {
             let swaggerSpec = loadFromFile(argv.path, argv.format);
             swaggerSpec = swaggerI18nExtension.translate(swaggerSpec, argv.lang);
-            let content = encodeResult(swaggerSpec, argv.format)
+            let content = encodeResult(swaggerSpec, argv.format, argv.indent)
             process.stdout.write(content + "\n")
         }
     ).command(
@@ -118,7 +125,7 @@ let commands = yargs
             }
             languageCodes.forEach((languageCode) => {
                 let swaggerTranslatedSpec = swaggerI18nExtension.translate(swaggerSpec, languageCode);
-                let result = encodeResult(swaggerTranslatedSpec, argv.format);
+                let result = encodeResult(swaggerTranslatedSpec, argv.format, argv.indent);
                 let outputPath = pathutils.join(outputDirectory, outputFileName + "." + languageCode + outputFileExt);
                 fs.writeFileSync(outputPath, result);
             });

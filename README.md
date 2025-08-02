@@ -46,6 +46,8 @@ Commands:
 
 Options:
   --version   Show version number                                      [boolean]
+  --format    yaml,yml or json                                         [string]
+  --indent    Number of spaces in json                                 [number]
   -h, --help  Show help                                                [boolean]
 
 Not enough non-option arguments: got 0, need at least 1
